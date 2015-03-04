@@ -1,10 +1,19 @@
 CC := gcc
 
-CPPFLAGS := -Wall -g
+MPI_CC := mpicc
+
+CPPFLAGS := -g -Wall -std=c99
 
 LDLIBS := -lm
 
-all: analysis
+all: analysis num_integration
+
+analysis: analysis.c
+	$(CC) $(CPPFLAGS) -lm -o $@ $<	
+
+num_integration: num_integration.c
+	$(MPI_CC) $(CPPFLAGS) `pkg-config --libs ompi` -o $@ $<
 
 clean:
-	rm analysis
+	rm -rf analysis
+	rm -rf num_integration
