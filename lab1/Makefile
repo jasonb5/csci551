@@ -12,7 +12,7 @@ analysis: analysis.c
 	$(CC) $(CPPFLAGS) -lm -o $@ $<	
 
 num_integration: num_integration.c
-	$(MPI_CC) $(CPPFLAGS) `pkg-config --libs ompi` -o $@ $<
+	$(MPI_CC) $(CPPFLAGS) `pkg-config --libs ompi` $(LDLIBS) -o $@ $<
 
 clean:
 	rm -rf analysis
