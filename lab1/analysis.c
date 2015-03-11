@@ -28,7 +28,11 @@ int main(int argc, char **argv) {
 	stride = 4096;
 
 	while (1) {
-		if (stride == 1) break;
+		if (stride == 1) {
+      index += stride*2;
+
+      break;
+    }
 
 		while (1) {
 			index += stride;
@@ -36,7 +40,6 @@ int main(int argc, char **argv) {
 			approx = calc_approx(a, b, index);
 
 			true_error = ABS(actual-approx)*100/actual;
-
 
 			if (true_error <= MAX_ERROR) {
 				break;
