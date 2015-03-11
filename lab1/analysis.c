@@ -30,9 +30,6 @@ int main(int argc, char **argv) {
 	while (1) {
 		if (stride == 1) break;
 
-		printf("Index at %d\n", index);
-		printf("Stride at %d\n", stride);
-
 		while (1) {
 			index += stride;
 
@@ -40,14 +37,8 @@ int main(int argc, char **argv) {
 
 			true_error = ABS(actual-approx)*100/actual;
 
-			printf("traps %d\n", index);
-			printf("actual %.10lf\n", actual);
-			printf("approx %.10lf\n", approx);
-			printf("true error %.16e\n", true_error);
 
 			if (true_error <= MAX_ERROR) {
-				printf("Found true error less than equal %.16e\n", MAX_ERROR);
-		
 				break;
 			}
 		}
@@ -56,6 +47,11 @@ int main(int argc, char **argv) {
 
 		stride /= 2;
 	}
+
+  printf("traps %d\n", index);
+  printf("actual %.10lf\n", actual);
+  printf("approx %.10lf\n", approx);
+  printf("true error %.16e\n", true_error);
 
 	return 0;
 }
