@@ -1,12 +1,6 @@
 #include <math.h>
 #include <stdio.h>
 
-#ifdef DEBUG
-#define debugf(x, ...) fprintf(stdout, x, ##__VA_ARGS__);
-#else
-#define debugf(x, ...)
-#endif
-
 #define ABS(x)(((x)<0)?-(x):(x))
 #define MAX_ERROR (0.5*pow(10, -12))
 
