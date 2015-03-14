@@ -4,7 +4,7 @@ MPI_CC := mpicc
 
 CPPFLAGS := -g -Wall -std=c99
 
-LDLIBS := -lm
+LDLIBS := -lm -lmpi
 
 all: analysis num_integration
 
@@ -12,7 +12,7 @@ analysis: analysis.c
 	$(CC) $(CPPFLAGS) -lm -o $@ $<	
 
 num_integration: num_integration.c
-	$(MPI_CC) $(CPPFLAGS) `pkg-config --libs ompi` $(LDLIBS) -o $@ $<
+	$(MPI_CC) $(CPPFLAGS) $(LDLIBS) -o $@ $<
 
 clean:
 	rm -rf analysis

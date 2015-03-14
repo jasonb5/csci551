@@ -8,7 +8,7 @@
 #endif
 
 #define ABS(x)(((x)<0)?-(x):(x))
-#define MAX_ERROR 0.5*pow(10, -12)
+#define MAX_ERROR (0.5*pow(10, -12))
 
 double calc_approx(double a, double b, int traps);
 double calc_actual(double a, double b);
