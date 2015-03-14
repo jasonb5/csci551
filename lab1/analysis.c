@@ -21,6 +21,7 @@ int main(int argc, char **argv) {
 
 	stride = 4096;
 
+	// Repeat until we cannot get a smaller stride
 	while (1) {
 		if (stride == 1) {
       index += stride*2;
@@ -28,6 +29,10 @@ int main(int argc, char **argv) {
       break;
     }
 
+		// Using current stride find an approximation
+		// fitting our requirements of a absolute
+		// relative true error less than equal to 
+		// MAX_ERROR
 		while (1) {
 			index += stride;
 
@@ -40,8 +45,10 @@ int main(int argc, char **argv) {
 			}
 		}
 
+		// Found a valid value step value back by strid
 		index -= stride;
 
+		// Reduce stride by 2 to repeat process
 		stride /= 2;
 	}
 
@@ -53,6 +60,7 @@ int main(int argc, char **argv) {
 	return 0;
 }
 
+// Approximates integral using Trapezoidal Method
 double calc_approx(double a, double b, int n) {
 	int i;
 	double h = (b-a)/n;
@@ -65,14 +73,17 @@ double calc_approx(double a, double b, int n) {
 	return h * approx;
 }
 
+// Calculates definite integral
 double calc_actual(double a, double b) {
 	return func_int(b)-func_int(a);
 }
 
+// Original function
 double func(double x) {
 	return 8+5*sin(x/4)-2*cos(x/5)+cos(x/3);
 }
 
+// Indefinite integral function
 double func_int(double x) {
 	return 8*x-10*sin(x/5)+3*sin(x/3)-20*cos(x/4);
 }
