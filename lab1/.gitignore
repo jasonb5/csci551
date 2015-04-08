@@ -1,2 +1,5 @@
 analysis
 num_integration
+*.tar.gz
+*.aux
+*.log
