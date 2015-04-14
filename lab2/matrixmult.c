@@ -37,8 +37,6 @@ int main(int argc, char **argv) {
   matrix_b = malloc(n * n * sizeof(int));
   
   local_n = (n * n)/ comm_sz;
-
-  printf("%i\n", local_n);
   
   if (comm_rank == 0) {
     if (strcmp(flag, "I") == 0) {
@@ -54,8 +52,32 @@ int main(int argc, char **argv) {
     }
   }
 
-  if (strcmp(form, "ijk") == 0) {
+  //  a = [[0, 1, 2], b = [[0, 1],
+  //       [3, 4, 5],      [2, 3],
+  //       [6, 7, 8]]      [4, 5]]
+  //  a = 3x3 = am x an b = 3x2 = bm x bn
+  //
+  //  ijk
+  //  for i[0..am-1]
+  //    for j[0..bn-1]
+  //      for k[0..an-1]
+  //        sum += a[i,k] * b[k,j]
+  //
+  //  ikj
+  //  for i[0..am-1]
+  //    for k[0..an-1]
+  //      for j[0..bn-1]
+  //        sum += a[i, k] * b[k,j] 
+  //
+  //  kij
+  //  for k[0..an-1]
+  //    for i[0..am-1]
+  //      for j[0..bn-1]
+  //        sum += a[
+  //
 
+  if (strcmp(form, "ijk") == 0) {
+    
   } else if (strcmp(form, "ikj") == 0) {
 
   } else if (strcmp(form, "kij") == 0) {
