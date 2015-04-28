@@ -1,7 +1,8 @@
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-#define MAX_RAND 1.0e6
+#define MAX_RAND 1.0e2 //1.0e6
 
 void swap_pivot(double **matrix, int col, int n);
 void generate_matrix(double **matrix, int n);
@@ -17,9 +18,10 @@ int main(int argc, char **argv) {
     exit(1);
   }
 
-  int n, i;
+  int n, i, j, k;
   double *vector;
   double **matrix;
+  double factor, interm;
 
   srand(time(NULL));
   srand48(time(NULL));
@@ -37,12 +39,28 @@ int main(int argc, char **argv) {
   generate_matrix(matrix, n);
   generate_vector(vector, n);
 
-  print_matrix(matrix, n);
+  for (i = 0; i < n; ++i) { 
+    print_matrix(matrix, n);
+    printf("\n");
+    swap_pivot(matrix, i, n);
+    printf("\n");
+    print_matrix(matrix, n);
 
-  swap_pivot(matrix, 0, n);
+    for (j = i + 1; j < n; ++j) {
+      factor = matrix[j][i] / matrix[i][i];
 
-  printf("\n");
-  print_matrix(matrix, n);
+      printf("\n%f\n", factor); 
+
+      for (k = 0; k < n; ++k) {
+        interm = matrix[i][k] * factor;
+
+        matrix[j][k] -= interm;
+      }
+
+      printf("\n");
+      print_matrix(matrix, n);
+    }
+  } 
 
   for (i = 0; i < n; ++i) {
     free(matrix[i]);
@@ -55,20 +73,25 @@ int main(int argc, char **argv) {
 }
 
 void swap_pivot(double **matrix, int col, int n) {
-  int i, j;
+  int i;
   int pivot; 
   double max;
+  double value;
   double *temp;
 
   max = 0;
 
   for (i = col; i < n; ++i) {
-    if (matrix[i][col] > max) {
+    value = fabs(matrix[i][col]);
+
+    if (value > max) {
       pivot = i;
 
-      max = matrix[i][col];
+      max = value;
     } 
   }
+
+  printf("Swapping row %i with row %i\n", pivot+1, col+1);
 
   temp = matrix[col];
 
