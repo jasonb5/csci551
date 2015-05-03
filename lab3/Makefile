@@ -1,3 +1,3 @@
-CPPFLAGS := -m64
+LDFLAGS := -lm
 
 gauss:

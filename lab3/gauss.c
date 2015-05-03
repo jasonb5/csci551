@@ -3,7 +3,13 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_RAND 1.0e2 //1.0e6
+#define MAX_RAND 1.0e6
+
+#ifdef DEBUG
+#define dprintf(X, ...) fprintf(stdout, "[DEBUG] " X, ##__VA_ARGS__)
+#else
+#define dprintf(X, ...)
+#endif
 
 void swap_pivot(double **matrix, int col, int n);
 void generate_aug_matrix(double **matrix, int n);
@@ -19,10 +25,13 @@ int main(int argc, char **argv) {
 
   int n;
   int i, j, k;
+  double sum;
   double factor;
   double interm;
+  double l2norm;
   double *result;
   double **matrix;
+  double **matrix_a;
 
   srand(time(NULL));
   srand48(time(NULL));
@@ -35,13 +44,23 @@ int main(int argc, char **argv) {
 
   matrix = malloc(n * sizeof(double));
 
+  matrix_a = malloc(n * sizeof(double));
+
   for (i = 0; i < n; ++i) {
     matrix[i] = malloc((n + 1) * sizeof(double));
+
+    matrix_a[i] = malloc((n + 1) * sizeof(double));
   }
 
   generate_aug_matrix(matrix, n);
 
   for (i = 0; i < n; ++i) {
+    memcpy(matrix_a[i], matrix[i], (n + 1) * sizeof(double));
+  }
+
+  for (i = 0; i < n - 1; ++i) {
+    print_aug_matrix(matrix, n);
+
     swap_pivot(matrix, i, n);
 
     print_aug_matrix(matrix, n);
@@ -49,15 +68,61 @@ int main(int argc, char **argv) {
     for (j = i + 1; j < n; ++j) {
       factor = matrix[j][i] / matrix[i][i];
 
-      printf("Factor %f\n", factor);
+      dprintf("Factor %f = %f / %f\n", factor, matrix[j][i], matrix[i][i]);
 
       for (k = 0; k < n + 1; ++k) {
         interm = factor * matrix[i][k];
 
+        dprintf("\n");
+        dprintf("Interm %f = %f * %f\n", interm, factor, matrix[i][k]);
+
         matrix[j][k] -= interm;
+
+        dprintf("i %i j %i new value %f\n", j, k, matrix[j][k]);
+        dprintf("\n");
       }
     }
+  } 
+
+  print_aug_matrix(matrix, n);
+
+  dprintf("Back Substitution on %i rows\n", n);
+
+  for (i = n - 1; i >= 0; --i) {
+    result[i] = matrix[i][n];
+
+    for (j = n - 1; j > i; --j) {
+      interm = matrix[i][j] * result[j];      
+
+      result[i] -= interm;
+
+      dprintf("Interm %f = %f * %f\n", interm, matrix[i][j], result[j]);
+    } 
+
+    result[i] /= matrix[i][i];
+
+    dprintf("%i\t%f\n", i, result[i]);
   }
+
+  print_aug_matrix(matrix_a, n);
+
+  for (i = 0; i < n; ++i) {
+    dprintf("%f\n", result[i]);
+  }
+
+  dprintf("Residual vector\n");
+
+  l2norm = 0;
+
+  for (i = 0; i < n; ++i) {
+    for (j = 0, sum = 0; j < n; ++j) {
+      sum += matrix_a[i][j] * result[j];
+    }
+
+    l2norm += pow(sum - matrix_a[i][n], 2);
+  }
+
+  printf("l2-norm %.16f\n", sqrt(l2norm));
 
   for (i = 0; i < n; ++i) {
     free(matrix[i]);
@@ -75,6 +140,8 @@ void swap_pivot(double **matrix, int col, int n) {
   double value;
   double *temp;
 
+  pivot = 0;
+
   for (i = col; i < n; ++i) {
     value = fabs(matrix[i][col]);
 
@@ -84,6 +151,10 @@ void swap_pivot(double **matrix, int col, int n) {
       max = value;
     } 
   }
+
+  if (pivot == col) return;
+
+  dprintf("Swapping row %i with %i\n", pivot, col);
 
   temp = matrix[pivot];
 
@@ -106,21 +177,26 @@ void generate_aug_matrix(double **matrix, int n) {
   }
 }
 
+#ifdef DEBUG
 void print_aug_matrix(double **matrix, int n) {
-  int i, j;
+  int i, j, t;
+  static char buf[1024];
 
-  printf("\n");
+  dprintf("\n");
 
   for (i = 0; i < n; ++i) {
-    for (j = 0; j < n; ++j) {
-      printf("%.2f\t", matrix[i][j]);
+    for (j = 0, t = 0; j < n; ++j) {
+      t += sprintf(&buf[t], "%.2f\t", matrix[i][j]);
     }
    
-    printf("\tx%i\t%.2f\n", i+1, matrix[i][n]);
+    dprintf("%s\tx%i\t%.2f\n", buf, i+1, matrix[i][n]);
   }
 
-  printf("\n");
+  dprintf("\n");
 }
+#else
+void print_aug_matrix(double **matrix, int n) { return; }
+#endif
 
 void print_usage(char *prog) {
   printf("%s n threads\n", prog); 
