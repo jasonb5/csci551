@@ -3,9 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_RAND 1.0e2 //1.0e6
-
-#define DEBUG
+#define MAX_RAND 1.0e6
 
 #ifdef DEBUG
 #define dprintf(X, ...) fprintf(stdout, "[DEBUG] " X, ##__VA_ARGS__)
@@ -27,11 +25,11 @@ int main(int argc, char **argv) {
 
   int n;
   int i, j, k;
-  double sum;
   double factor;
   double interm;
   double l2norm;
   double *result;
+  double *result_res;
   double **matrix;
   double **matrix_a;
 
@@ -41,6 +39,8 @@ int main(int argc, char **argv) {
   n = atoi(argv[1]);
 
   result = malloc(n * sizeof(double));
+
+  result_res = malloc(n * sizeof(double));
 
   memset(result, 0, n * sizeof(double));
 
@@ -104,10 +104,40 @@ int main(int argc, char **argv) {
   }
 
   for (i = 0; i < n; ++i) {
+    interm = 0;
+
+    for (j = 0; j < n; ++j) {
+      interm += matrix_a[i][j] * result[j];
+    }
+
+    result_res[i] = interm - matrix_a[i][n];
+
+    dprintf("%.16f\n", result_res[i]);
+  }
+
+  l2norm = 0;
+
+  for (i = 0; i < n; ++i) {
+    l2norm += pow(fabs(result_res[i]), 2); 
+  }
+
+  l2norm = sqrt(l2norm);
+
+  printf("l2-norm %.16f\n", l2norm);
+
+  free(result);
+
+  free(result_res);
+
+  for (i = 0; i < n; ++i) {
     free(matrix[i]);
+
+    free(matrix_a[i]);
   }
 
   free(matrix);
+
+  free(matrix_a);
 
   return 0;
 }
