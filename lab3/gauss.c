@@ -3,7 +3,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define MAX_RAND 1.0e6
+#define MAX_RAND 1.0e2 //1.0e6
+
+#define DEBUG
 
 #ifdef DEBUG
 #define dprintf(X, ...) fprintf(stdout, "[DEBUG] " X, ##__VA_ARGS__)
@@ -58,6 +60,8 @@ int main(int argc, char **argv) {
     memcpy(matrix_a[i], matrix[i], (n + 1) * sizeof(double));
   }
 
+  dprintf("Forward elimination\n");
+    
   for (i = 0; i < n - 1; ++i) {
     print_aug_matrix(matrix, n);
 
@@ -73,56 +77,31 @@ int main(int argc, char **argv) {
       for (k = 0; k < n + 1; ++k) {
         interm = factor * matrix[i][k];
 
-        dprintf("\n");
         dprintf("Interm %f = %f * %f\n", interm, factor, matrix[i][k]);
+        dprintf("\t%f = %f - %f\n", matrix[j][k]-interm, matrix[j][k], interm);
 
         matrix[j][k] -= interm;
-
-        dprintf("i %i j %i new value %f\n", j, k, matrix[j][k]);
-        dprintf("\n");
       }
     }
-  } 
 
-  print_aug_matrix(matrix, n);
+    print_aug_matrix(matrix, n);
+  }
 
-  dprintf("Back Substitution on %i rows\n", n);
+  dprintf("Backwards substitution\n"); 
 
   for (i = n - 1; i >= 0; --i) {
     result[i] = matrix[i][n];
 
     for (j = n - 1; j > i; --j) {
-      interm = matrix[i][j] * result[j];      
+      dprintf("%f = %f * %f\n", matrix[i][j] * result[j], matrix[i][j], result[j]);
 
-      result[i] -= interm;
-
-      dprintf("Interm %f = %f * %f\n", interm, matrix[i][j], result[j]);
-    } 
-
-    result[i] /= matrix[i][i];
-
-    dprintf("%i\t%f\n", i, result[i]);
-  }
-
-  print_aug_matrix(matrix_a, n);
-
-  for (i = 0; i < n; ++i) {
-    dprintf("%f\n", result[i]);
-  }
-
-  dprintf("Residual vector\n");
-
-  l2norm = 0;
-
-  for (i = 0; i < n; ++i) {
-    for (j = 0, sum = 0; j < n; ++j) {
-      sum += matrix_a[i][j] * result[j];
+      result[i] -= matrix[i][j] * result[j]; 
     }
 
-    l2norm += pow(sum - matrix_a[i][n], 2);
+    result[i] /= matrix[i][i];
+      
+    dprintf("%f\n", result[i]);
   }
-
-  printf("l2-norm %.16f\n", sqrt(l2norm));
 
   for (i = 0; i < n; ++i) {
     free(matrix[i]);
