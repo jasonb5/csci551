@@ -68,11 +68,11 @@ int main(int argc, char **argv) {
   for (i = 0; i < n; ++i) {
     memcpy(matrix_a[i], matrix[i], (n + 1) * sizeof(double));
   }
+
+  start = omp_get_wtime();
     
   for (i = 0; i < n - 1; ++i) {
     swap_pivot(matrix, i, n);
-
-  start = omp_get_wtime();
 
 #pragma omp parallel for private(j, k, factor, interm) \
   shared(i, n, matrix) default(none) num_threads(threads)
